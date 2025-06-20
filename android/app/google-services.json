@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "225962385955",
+    "project_id": "crisissurvivors-6f26f",
+    "storage_bucket": "crisissurvivors-6f26f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:225962385955:android:84e38ecbe93bc3e33e8796",
+        "android_client_info": {
+          "package_name": "com.example.crisis_survivors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV91YU0S-otBMXg8xHfltenKOpXjO3jkU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
