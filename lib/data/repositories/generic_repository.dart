@@ -42,7 +42,7 @@ class GenericRepository<T extends BaseModel> {
         .toList();
   }
 
-  Future<List<T>> getFiltered(
+  Future<List<T>> getFilteredBy(
     Map<String, dynamic> filters,
   ) async {
     Query query = _collection;
