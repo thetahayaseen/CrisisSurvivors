@@ -2,13 +2,14 @@ import 'package:crisis_survivors/data/enums/gender.dart';
 import 'package:crisis_survivors/data/enums/marriage_status.dart';
 import 'package:crisis_survivors/data/enums/role.dart';
 import 'package:crisis_survivors/data/models/bank_account/bank_account.dart';
+import 'package:crisis_survivors/data/models/base_model.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part "user_profile.g.dart";
 part "user_profile.freezed.dart";
 
 @freezed
-class UserProfile with _$UserProfile {
+class UserProfile with _$UserProfile implements BaseModel {
   const factory UserProfile({
     required String id,
     required String userId,
