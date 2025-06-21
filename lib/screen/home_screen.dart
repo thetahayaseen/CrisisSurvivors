@@ -10,7 +10,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.person),
+            icon: const Icon(Icons.person),
             onPressed: () {
               Navigator.push(
                   context,
@@ -33,8 +33,8 @@ class HomeScreen extends StatelessWidget {
       body: const Center(
         child: Column(
           children: [
-            const Text("Welcome!"),
-            const SignOutButton(),
+            Text("Welcome!"),
+            SignOutButton(),
           ],
         ),
       ),
