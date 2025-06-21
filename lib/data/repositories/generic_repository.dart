@@ -30,4 +30,31 @@ class GenericRepository<T extends BaseModel> {
   Future<void> delete(String id) async {
     await _collection.doc(id).delete();
   }
+
+  Future<List<T>> getWhere(
+    String field,
+    dynamic value,
+  ) async {
+    final snapshot = await _collection.where(field, isEqualTo: value).get();
+
+    return snapshot.docs
+        .map((doc) => fromJson(doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
+
+  Future<List<T>> getFiltered(
+    Map<String, dynamic> filters,
+  ) async {
+    Query query = _collection;
+
+    filters.forEach((field, value) {
+      query = query.where(field, isEqualTo: value);
+    });
+
+    final snapshot = await query.get();
+
+    return snapshot.docs
+        .map((doc) => fromJson(doc.data() as Map<String, dynamic>, doc.id))
+        .toList();
+  }
 }
