@@ -1,8 +1,8 @@
+import 'package:crisis_survivors/components/auth/auth_redirect.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:crisis_survivors/screen/home_screen.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -13,6 +13,12 @@ class AuthGate extends StatelessWidget {
         // Constantly listen for auth changes (returns User if one is authenticated)
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }          
+
           if (!snapshot.hasData) {
             // If, no user data found
             return SignInScreen(
@@ -27,7 +33,7 @@ class AuthGate extends StatelessWidget {
           }
 
           // If user data found
-          return const HomeScreen();
+          return const AuthGateRedirect();
         });
   }
 }
