@@ -6,10 +6,10 @@ class UserProfileService {
 
   UserProfileService()
       : _repository = GenericRepository<UserProfile>(
-          path: 'user_profiles', // 👈 your Firestore collection name
+          path: 'user_profiles', 
           fromJson: (json, id) => UserProfile.fromJson({
             ...json,
-            'id': id, // 👈 inject Firestore doc ID
+            'id': id, 
           }),
         );
 
@@ -29,11 +29,11 @@ class UserProfileService {
     return _repository.delete(id);
   }
 
-  Future<List<UserProfile>> getAllProfilesWhere(String field, dynamic value) {
+  Future<List<UserProfile>> getProfilesWhere(String field, dynamic value) {
     return _repository.getWhere(field, value);
   }
 
-  Future<List<UserProfile>> getAllProfilesFilteredBy(
+  Future<List<UserProfile>> getProfilesFilteredBy(
       Map<String, dynamic> filters) {
     return _repository.getFilteredBy(filters);
   }
