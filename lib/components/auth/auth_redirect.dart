@@ -2,7 +2,7 @@ import 'package:crisis_survivors/data/enums/role.dart';
 import 'package:crisis_survivors/data/models/user_profile/user_profile.dart';
 import 'package:crisis_survivors/data/services/user_profile_service.dart';
 import 'package:crisis_survivors/screens/home_screen.dart';
-import 'package:crisis_survivors/screens/user_profile/select_profile_screen.dart';
+import 'package:crisis_survivors/screens/user_profile/select_role_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
