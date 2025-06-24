@@ -1,15 +1,18 @@
-import 'dart:io';
-import 'package:crisis_survivors/data/enums/gender.dart';
-import 'package:crisis_survivors/data/enums/marriage_status.dart';
-import 'package:crisis_survivors/data/enums/role.dart';
-import 'package:crisis_survivors/utils/extensions/enum_extensions.dart';
-import 'package:crisis_survivors/widgets/base_text_field.dart';
-import 'package:crisis_survivors/widgets/base_dropdown.dart';
-import 'package:crisis_survivors/widgets/base_date_picker.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import "dart:io";
+import "package:crisis_survivors/data/enums/gender.dart";
+import "package:crisis_survivors/data/enums/marriage_status.dart";
+import "package:crisis_survivors/data/enums/role.dart";
+import "package:crisis_survivors/data/models/bank_account/bank_account.dart";
+import "package:crisis_survivors/data/models/user_profile/user_profile.dart";
+import "package:crisis_survivors/data/services/firestore/user_profile_service.dart";
+import "package:crisis_survivors/utils/extensions/enum_extensions.dart";
+import "package:crisis_survivors/widgets/base_text_field.dart";
+import "package:crisis_survivors/widgets/base_dropdown.dart";
+import "package:crisis_survivors/widgets/base_date_picker.dart";
+import "package:file_picker/file_picker.dart";
+import "package:firebase_auth/firebase_auth.dart";
+import "package:flutter/material.dart";
+import "package:google_fonts/google_fonts.dart";
 
 class GetBasicInformationScreen extends StatefulWidget {
   const GetBasicInformationScreen({super.key, required this.role});
@@ -20,6 +23,8 @@ class GetBasicInformationScreen extends StatefulWidget {
 }
 
 class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
+
+  late final UserProfileService _userProfileService;
 
   late String userId;
 
@@ -45,8 +50,11 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       userId = currentUser.uid;
-      _emailController.text = currentUser.email ?? '';
+      _emailController.text = currentUser.email ?? "";
     }
+
+    _userProfileService = UserProfileService();
+    
   }
 
   @override
@@ -69,7 +77,7 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
     }
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     setState(() => isButtonClicked = true);
 
     if (_nameController.text.isEmpty ||
@@ -82,13 +90,49 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
         _branchCodeController.text.isEmpty ||
         _accountNumberController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all the fields!')),
-      ); 
+        const SnackBar(content: Text("Please fill all the fields!")),
+      );  
 
-      showDialog(barrierDismissible: false, context: context, builder: (_) => const CircularProgressIndicator());
-      return;
+    String? profilePictureUrl;
+    if (selectedProfilePicture != null) {
+      profilePictureUrl = await _userProfileService.uploadProfilePicture(
+        userId: userId, profilePicture: selectedProfilePicture!
+      );
     }
+
+    num accountNumber = num.parse(_accountNumberController.text); 
+
+      final userProfile = UserProfile(
+      id: "",
+      userId: userId,
+      role: widget.role,
+      name: _nameController.text,
+      email: _emailController.text,
+      contactNumber: _contactController.text,
+      gender: Gender.values.byPascalCase(selectedGender!), 
+      dateOfBirth: _selectedDate!,
+      marriageStatus: MarriageStatus.values.byPascalCase(selectedMarriageStatus!),
+      bankAccountDetails: BankAccountDetails(
+        bank: _bankController.text,
+        branchCode: _branchCodeController.text,
+        accountNumber: accountNumber,
+      ),
+      profilePicture: profilePictureUrl,
+    );
+    
+    if (!mounted) return;
+
+   showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+
+  await _userProfileService.createOrUpdateProfile(userProfile);
+
+  if (mounted) Navigator.of(context).pop();   
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +158,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
 
             BaseTextField(
               controller: _nameController,
-              label: 'Full Name',
-              hintText: 'Enter your full name',
+              label: "Full Name",
+              hintText: "Enter your full name",
               isRequired: true,
               isButtonClicked: isButtonClicked,
               width: width,
@@ -124,8 +168,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
 
             BaseTextField(
               controller: _contactController,
-              label: 'Contact Number',
-              hintText: 'Enter phone number',
+              label: "Contact Number",
+              hintText: "Enter phone number",
               isRequired: true,
               isButtonClicked: isButtonClicked,
               width: width,
@@ -134,8 +178,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
 
             BaseTextField(
               controller: _emailController,
-              label: 'Email',
-              hintText: 'Enter email',
+              label: "Email",
+              hintText: "Enter email",
               isRequired: true,
               isButtonClicked: isButtonClicked,
               width: width,
@@ -143,8 +187,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
             const SizedBox(height: 16),
 
             BaseDatePickerField(
-              labelText: 'Date of Birth',
-              hintText: 'Select your birth date',
+              labelText: "Date of Birth",
+              hintText: "Select your birth date",
               selectedDate: _selectedDate,
               onDateSelected: (date) => setState(() => _selectedDate = date),
               isRequired: true,
@@ -154,7 +198,7 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
             const SizedBox(height: 16),
 
             BaseDropdown(
-              label: 'Gender',
+              label: "Gender",
               items: Gender.values.pascalCaseNames,
               selectedValue: selectedGender,
               onChanged: (val) => setState(() => selectedGender = val),
@@ -164,7 +208,7 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
             const SizedBox(height: 16),
 
             BaseDropdown(
-              label: 'Marital Status',
+              label: "Marital Status",
               items: MarriageStatus.values.pascalCaseNames,
               selectedValue: selectedMarriageStatus,
               onChanged: (val) => setState(() => selectedMarriageStatus = val),
@@ -186,8 +230,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
 
             BaseTextField(
               controller: _bankController,
-              label: 'Bank Name',
-              hintText: 'Enter bank name',
+              label: "Bank Name",
+              hintText: "Enter bank name",
               isRequired: true,
               isButtonClicked: isButtonClicked,
               width: width,
@@ -196,8 +240,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
 
             BaseTextField(
               controller: _branchCodeController,
-              label: 'Branch Code',
-              hintText: 'Enter branch code',
+              label: "Branch Code",
+              hintText: "Enter branch code",
               isRequired: true,
               isButtonClicked: isButtonClicked,
               width: width,
@@ -206,8 +250,8 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
 
             BaseTextField(
               controller: _accountNumberController,
-              label: 'Account Number',
-              hintText: 'Enter account number',
+              label: "Account Number",
+              hintText: "Enter account number",
               isRequired: true,
               isButtonClicked: isButtonClicked,
               width: width,
@@ -225,7 +269,7 @@ class _GetBasicInformationScreenState extends State<GetBasicInformationScreen> {
                     color: Colors.brown,
                   ),
                   label: Text(
-                    selectedProfilePicture == null ? 'Upload Profile Picture' : 'Change Picture',
+                    selectedProfilePicture == null ? "Upload Profile Picture" : "Change Picture",
                     style: GoogleFonts.poppins(
                       fontSize: width / 30,
                       color: Colors.brown,
