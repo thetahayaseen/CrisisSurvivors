@@ -106,7 +106,7 @@ class SelectRoleScreen extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         elevation: 4,
-        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       ),
       child: Row(
         children: [
