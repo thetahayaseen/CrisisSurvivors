@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:crisis_survivors/data/models/user_profile/user_profile.dart';
 import 'package:crisis_survivors/data/repositories/generic_repository.dart';
+import 'package:crisis_survivors/data/services/storage/file_management_service.dart';
 
 class UserProfileService {
+  final userProfileBucket = "user_profiles";
   final GenericRepository<UserProfile> _repository;
 
   UserProfileService()
@@ -13,7 +16,7 @@ class UserProfileService {
           }),
         );
 
-  Future<void> createOrUpdateProfile(UserProfile profile) {
+  Future<void> createOrUpdateProfile(UserProfile profile) async {
     return _repository.createOrUpdate(profile);
   }
 
@@ -37,4 +40,17 @@ class UserProfileService {
       Map<String, dynamic> filters) {
     return _repository.getFilteredBy(filters);
   }
+
+  Future<String?> uploadProfilePicture(
+    {required String userId, required File profilePicture}
+  ) async {
+    final picturePath = "profile_pictures/$userId";
+
+    FileManagementService fileManagementService = FileManagementService();
+    String? profilePicturePublicUrl = await fileManagementService.uploadFile(bucket: userProfileBucket, path: picturePath, file: profilePicture);    
+
+    if(profilePicturePublicUrl == null) return null;    
+    return profilePicturePublicUrl;
+  }
+
 }
