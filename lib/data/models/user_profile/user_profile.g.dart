@@ -57,5 +57,4 @@ const _$MarriageStatusEnumMap = {
   MarriageStatus.divorced: 'divorced',
   MarriageStatus.widowed: 'widowed',
   MarriageStatus.separated: 'separated',
-  MarriageStatus.preferNotToSay: 'prefer_not_to_say',
 };

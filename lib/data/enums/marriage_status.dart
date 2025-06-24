@@ -7,5 +7,4 @@ enum MarriageStatus {
   divorced,
   widowed,
   separated,
-  preferNotToSay,
 }
